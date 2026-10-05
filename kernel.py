@@ -34,13 +34,17 @@ class Kernel:
         self.scheduling_algorithm = scheduling_algorithm
         self.ready_queue = deque()
         self.waiting_queue = deque()
-        self.idle_pcb = PCB(0)
+        self.idle_pcb = PCB(0) # to run as begining
         self.running = self.idle_pcb
 
     # This method is triggered every time a new process has arrived.
     # new_process is this process's PID.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def new_process_arrived(self, new_process: PID) -> PID:
+        if self.running.pid == 0:
+            self.running = PCB(new_process)
+        else:
+            self.ready_queue.append(PCB(new_process))
         return self.running.pid
 
     # This method is triggered every time the current process performs an exit syscall.
