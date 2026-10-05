@@ -50,7 +50,7 @@ class Kernel:
     # This method is triggered every time the current process performs an exit syscall.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def syscall_exit(self) -> PID:
-        if not self.ready_queue:
+        if self.ready_queue:
             self.running = self.ready_queue.popleft()
         else:
             self.running = self.idle_pcb
