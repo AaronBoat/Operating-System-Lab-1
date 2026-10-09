@@ -1,6 +1,6 @@
 ### Fill in the following information before submitting
-# Group id: 
-# Members: 
+# Group id: 11 
+# Members: Wendy Wu, Yizhou Xu, Khang Tran
 
 from collections import deque
 
@@ -41,11 +41,16 @@ class Kernel:
     # new_process is this process's PID.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def new_process_arrived(self, new_process: PID) -> PID:
+        self.ready_queue.append(PCB(new_process))  #create a PCB for new process and add it to the back of the queue
+        if self.running.pid == 0:
+            self.choose_next_process()  #PID is 0, first process selected in queue to run
         return self.running.pid
 
     # This method is triggered every time the current process performs an exit syscall.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def syscall_exit(self) -> PID:
+        # The current process has finished; give the CPU to the oldest arrival.
+        self.choose_next_process()
         return self.running.pid
     
 
@@ -54,12 +59,12 @@ class Kernel:
     # Feel free to modify this method as you see fit.
     # It is not required to actually use this method but it is recommended.
     def choose_next_process(self):
-        if len(self.ready_queue) == 0:
-                return self.idle_pcb
-        
-        if self.scheduling_algorithm == "FCFS":
-            self.running = self.idle_pcb
+        if self.scheduling_algorithm != "FCFS":
+            raise ValueError("Unknown scheduling algorithm")
+        if len(self.ready_queue) != 0:    #queue contain atleast one process
+            self.running = self.ready_queue.popleft()  #remove and return first PCB in queue then store in self.running
         else:
-            print("Unknown scheduling algorithm")
+            self.running = self.idle_pcb   #when PID is 0, idle PCB
+
         
 
