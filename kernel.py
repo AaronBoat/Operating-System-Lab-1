@@ -1,6 +1,6 @@
 ### Fill in the following information before submitting
-# Group id: 
-# Members: 
+# Group id: 11
+# Members: 	Yizhou Xu, Wendy Wu, Khang Tran
 
 from collections import deque
 
@@ -14,6 +14,7 @@ class PCB:
 
     def __init__(self, pid: PID):
         self.pid = pid
+
 
 # This class represents the Kernel of the simulation.
 # The simulator will create an instance of this object and use it to respond to syscalls and interrupts.
@@ -37,28 +38,35 @@ class Kernel:
         self.idle_pcb = PCB(0)
         self.running = self.idle_pcb
 
+
     # This method is triggered every time a new process has arrived.
     # new_process is this process's PID.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def new_process_arrived(self, new_process: PID) -> PID:
+        self.ready_queue.append(PCB(new_process))           # Wrap new PID in PCB and add it to the queue
+        if self.running is self.idle_pcb:                   # If idle, choose_next() to start the process
+            self.choose_next_process()
         return self.running.pid
+        
 
     # This method is triggered every time the current process performs an exit syscall.
     # DO NOT rename or delete this method. DO NOT change its arguments.
     def syscall_exit(self) -> PID:
+        self.choose_next_process()                          # Assign self.running to new PCB
         return self.running.pid
-    
+
 
     # This is where you can select the next process to run.
     # This method is not directly called by the simulator and is purely for your convinience.
     # Feel free to modify this method as you see fit.
     # It is not required to actually use this method but it is recommended.
     def choose_next_process(self):
-        if len(self.ready_queue) == 0:
-                return self.idle_pcb
+        if len(self.ready_queue) == 0:                      # Returns idle process if queue is empty
+            self.running = self.idle_pcb                    # If there are no more PIDs in the queue, set back to idle
+            return
         
-        if self.scheduling_algorithm == "FCFS":
-            self.running = self.idle_pcb
+        if self.scheduling_algorithm == "FCFS":             # FCFS grabs the first process in queue
+            self.running = self.ready_queue.popleft()       # Set it to current running
         else:
             print("Unknown scheduling algorithm")
         
